@@ -1,11 +1,26 @@
 #include <Servo.h>
-#include <PulseInOne.h>
 #include "notas.h"
+#include "PulseInOne.h"
+
 
 /** 
 * On utilise des #define plutôt que des variables sur les constantes
 * cela prend moins de place en mémoire vive !! (car remplacées lors de la complilation)
 */
+#define CMD_FORWARD 'U'
+#define CMD_BACKWARD 'D'
+#define CMD_TURNLEFT 'L'
+#define CMD_TURNRIGHT 'R'
+#define CMD_TURNAROUND 'C'
+
+
+
+
+
+
+
+
+
 
 #define BuzzerPin  9
 int speakerPin = 9;
@@ -63,7 +78,7 @@ void setup(){
   //pinMode(green, OUTPUT);	digitalWrite(green, LOW);
   //pinMode(yellow, OUTPUT);	digitalWrite(yellow, LOW);
   //pinMode(red, OUTPUT);		digitalWrite(red, LOW);
-  
+  pinMode(13, OUTPUT);
   pinMode(BuzzerPin, OUTPUT);	digitalWrite(BuzzerPin, LOW);
   pinMode(BuzzerPin-1, OUTPUT);	digitalWrite(BuzzerPin-1, LOW); // branchement buzzer (identique a GND)
   //Buzzer.PlayMelody();
@@ -82,6 +97,7 @@ void setup(){
   }
   squeak();
 }
+
 void updatePingTimer(){
   unsigned long time = millis();
   unsigned long dt   = time - lastTime;
@@ -93,8 +109,50 @@ void updatePingTimer(){
     ping();
   }
 }
-void loop() { 
-  Walk();
+
+/* Size of the received data buffer */
+#define bufferSize          5
+char dataBuffer[bufferSize]; 
+int i = 0;
+int numChar = 0;    
+
+void loop() {
+  if (Serial.available() > 0) { 
+   
+    /* Reset the iterator and clear the buffer */
+    i = 0;
+    memset(dataBuffer, 0, sizeof(dataBuffer));  
+    
+    /* Wait for let the buffer fills up. Depends on the length of 
+       the data, 1 ms for each character more or less */
+    delay(bufferSize); 
+
+    /* Number of characters availables in the Bluetooth Serial */
+    numChar = Serial.available();   
+    
+    /* Limit the number of characters that will be read from the
+       Serial to avoid reading more than the size of the buffer */
+    if (numChar > bufferSize) {
+          numChar = bufferSize;
+    }
+
+    /* Read the Bluetooth Serial and store it in the buffer*/
+    while (numChar--) {
+        dataBuffer[i++] = Serial.read();
+
+        /* As data trickles in from your serial port you are 
+         grabbing as much as you can, but then when it runs out 
+         (as it will after a few bytes because the processor is 
+         much faster than a 9600 baud device) you exit loop, which
+         then restarts, and resets i to zero, and someChar to an 
+         empty array.So please be sure to keep this delay */
+        delay(3);
+    } 
+
+    /* Manage the data */   
+    checkData(dataBuffer);
+
+  //Walk();
   /*switch (Obstacle){
     case 0: //no object
        Forward(10,90); //one step Forward
@@ -112,9 +170,48 @@ void loop() {
        TurnLeft(4,60); //turn around
        BuzzerBeep();
        break;
-   }*/  
+   }*/
+  } 
 }
 
+
+void checkData(char* data){  
+
+  switch(data[0]) {
+    case'S':
+      /* Stop button pressed */
+      //stopWheels();
+      break;
+    
+    case 'U':
+      /* Up button pressed */
+      goForwards();
+      digitalWrite(13, HIGH);
+      delay(2000);
+      digitalWrite(13, LOW);
+      break;
+    
+    case 'D':
+      /* Down button pressed */
+      //goBackwards();
+      break;
+      
+    case 'L':
+      /* Left button pressed */ 
+      //goLeft();
+      break;
+      
+    case 'R':
+      /* Right button pressed */ 
+      //goRight();
+      break;
+  
+  }
+
+  /* Empty the Serial */   
+  Serial.flush();
+
+}
 
 /**
  * Center servos
