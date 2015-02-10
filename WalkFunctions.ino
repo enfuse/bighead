@@ -1,6 +1,8 @@
 void Walk(){
   Obstacle = 0;
-  TiltRightUp(tAngle, Speed);
+  updatePingTimer();
+  if(Obstacle==0)
+    TiltRightUp(tAngle, Speed);
   while (Obstacle==0){
     stepForward(Speed);
     updatePingTimer();
@@ -8,16 +10,16 @@ void Walk(){
   TiltRightDown(tAngle, Speed);
   switch (Obstacle){
      case 1: //object on Left
+        ohhh();
        TurnRight(2,60);
-       BuzzerBeep();
        break;
      case 2: //object on Right
+        ohhh();
        TurnLeft(2,60);
-       BuzzerBeep();
        break;
      case 3: //obect in Front (both Left and Right detect the object)
+        ohhh();
        TurnLeft(4,60); //turn around
-       BuzzerBeep();
        break;
    }
 }
@@ -45,6 +47,7 @@ void stepBackward(byte Speed){
 }
 
 void TurnLeft(byte Steps, byte Speed){
+  Back(1, Speed);
   TiltLeftUp(uAngle, Speed);
   delay(20);
   for (byte j=0; j<Steps; ++j){
@@ -63,6 +66,7 @@ void TurnLeft(byte Steps, byte Speed){
 }
 
 void TurnRight(byte Stps, byte Speed){
+  Back(1, Speed);
   TiltRightUp(uAngle, Speed);
   delay(20);
   for (byte f=0; f<=Stps; ++f){

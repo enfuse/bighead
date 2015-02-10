@@ -1,30 +1,28 @@
 #include <Servo.h>
 #include <PulseInOne.h>
+#include "notas.h"
 
 /** 
 * On utilise des #define plutôt que des variables sur les constantes
 * cela prend moins de place en mémoire vive !! (car remplacées lors de la complilation)
 */
 
-#define BuzzerPin 13
-
-#define red 12
-#define yellow 11
-#define green 10
-
+#define BuzzerPin  9
+int speakerPin = 9;
 #define EnableServo 14  // activation des servos (la pin 14 est en faite la pin A0)
+
 Servo Lleg;  // create servo object to control a servo 
 Servo Rleg;
 Servo Lfoot;
 Servo Rfoot;
 
-int Speed = 70;
+int Speed = 50;
 
 int RFcenter = 90;    // variable to store the center servo position 
 int LLcenter = 90;
 int RLcenter = 87;
 int LFcenter = 90;
-int tAngle = 10; //tilt angle
+int tAngle = 18; //tilt angle
 int uAngle = 15; //turn angle
 int sAngle = 30; //swing angle
 
@@ -61,10 +59,10 @@ void setup(){
   Lfoot.attach(7);  // attaches the servo on pin x to the servo object 
   Rfoot.attach(6);  // attaches the servo on pin x to the servo object 
   CenterServos(); //center the servos
-  
-  pinMode(green, OUTPUT);	digitalWrite(green, LOW);
-  pinMode(yellow, OUTPUT);	digitalWrite(yellow, LOW);
-  pinMode(red, OUTPUT);		digitalWrite(red, LOW);
+  randomSeed(analogRead(0));
+  //pinMode(green, OUTPUT);	digitalWrite(green, LOW);
+  //pinMode(yellow, OUTPUT);	digitalWrite(yellow, LOW);
+  //pinMode(red, OUTPUT);		digitalWrite(red, LOW);
   
   pinMode(BuzzerPin, OUTPUT);	digitalWrite(BuzzerPin, LOW);
   pinMode(BuzzerPin-1, OUTPUT);	digitalWrite(BuzzerPin-1, LOW); // branchement buzzer (identique a GND)
@@ -82,7 +80,7 @@ void setup(){
   for(int i=0;i<5;++i){
     delay(1000);
   }
-  BuzzerBeep();
+  squeak();
 }
 void updatePingTimer(){
   unsigned long time = millis();

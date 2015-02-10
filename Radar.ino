@@ -19,8 +19,8 @@ void ping(){
 */
 void pingPulseComplete(unsigned long duration) { 
   millimetres = MicrosecondsToMillimetres2 * duration;
-  if(millimetres < 170.00){
-    Obstacle = 3;
+  if(millimetres < 200.00){
+    Obstacle = random(1, 4);
   }
   if(millimetres > 4000){
     millimetres = 4000;
